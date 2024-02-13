@@ -16,11 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/users")
-public class UserController {
+@RequestMapping("/api/v2/users")
+public class UserDocController {
+
     private final IAccessUserService accessUserService;
 
-    public UserController(@Qualifier("AccessUserService") IAccessUserService accessUserService) {
+    public UserDocController(@Qualifier("AccessUserDocService") IAccessUserService accessUserService) {
         this.accessUserService = accessUserService;
     }
 
@@ -28,7 +29,6 @@ public class UserController {
     public UserDto getUserById(@PathVariable String id) {
         return accessUserService.getUserById(id);
     }
-
     @GetMapping
     public List<UserDto> getUsers(@RequestParam(required = false) String email) {
         if (email != null && !email.isEmpty()) {
@@ -43,8 +43,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public UserDto updateUser(@PathVariable long id, @RequestBody UserDto userDto) {
-        userDto.setId(String.valueOf(id));
+    public UserDto updateUser(@PathVariable String id, @RequestBody UserDto userDto) {
+        userDto.setId(id);
         return accessUserService.updateUser(userDto);
     }
 

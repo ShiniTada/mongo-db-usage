@@ -1,12 +1,12 @@
-package com.example.demo.service;
+package com.example.demo.service.accessdata;
 
 
 import com.example.demo.dto.UserDto;
 
 import java.util.List;
 
-public interface UserService {
-    UserDto getUserById(long userId);
+public interface IAccessUserService {
+    UserDto getUserById(String userId);
 
     List<UserDto> getAllUsers();
 
@@ -14,7 +14,7 @@ public interface UserService {
 
     UserDto updateUser(UserDto user);
 
-    void deleteUser(long userId);
+    void deleteUser(String userId);
 
     UserDto getByEmail(String email);
 }

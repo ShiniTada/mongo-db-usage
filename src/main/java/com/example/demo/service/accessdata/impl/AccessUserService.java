@@ -1,34 +1,35 @@
-package com.example.demo.service.impl;
+package com.example.demo.service.accessdata.impl;
 
 import com.example.demo.data.Certificate;
+import com.example.demo.data.MigrationStatus;
 import com.example.demo.data.User;
 import com.example.demo.dto.CertificateDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.service.UserService;
-import com.example.demo.service.mapper.Mapper;
+import com.example.demo.service.accessdata.IAccessUserService;
+import com.example.demo.service.mapper.IMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Service("UserServiceImpl")
-public class UserServiceImpl implements UserService {
+@Service("AccessUserService")
+public class AccessUserService implements IAccessUserService {
 
     private final UserRepository userRepository;
-    private final Mapper<User, UserDto> userMapper;
-    private final Mapper<Certificate, CertificateDto> certificateMapper;
+    private final IMapper<User, UserDto> userMapper;
+    private final IMapper<Certificate, CertificateDto> certificateMapper;
 
-    public UserServiceImpl(UserRepository userRepository, Mapper<User, UserDto> userMapper, Mapper<Certificate, CertificateDto> certificateMapper) {
+    public AccessUserService(UserRepository userRepository, IMapper<User, UserDto> userMapper, IMapper<Certificate, CertificateDto> certificateMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.certificateMapper = certificateMapper;
     }
 
     @Override
-    public UserDto getUserById(long userId) {
-        return userRepository.findById(userId)
+    public UserDto getUserById(String userId) {
+        return userRepository.findById(Long.parseLong(userId))
                 .map(userMapper::mapModelToDto)
                 .orElseThrow(() -> new RuntimeException("No user with ID: " + userId));
     }
@@ -44,6 +45,7 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(UserDto dto) {
         User user = userMapper.mapDtoToModel(dto);
         user = attachCertificatesToUser(user, dto.getCertificates());
+        user.setMigrationStatus(MigrationStatus.NEW);
         User savedUser = userRepository.save(user);
         return userMapper.mapModelToDto(savedUser);
     }
@@ -51,14 +53,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(UserDto dto) {
         try {
-            Long userId = dto.getId();
+            Long userId = Long.parseLong(dto.getId());
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("No user with ID: " + userId));
             user.getCertificates().clear();
-            user.setId(dto.getId());
+            user.setId(Long.parseLong(dto.getId()));
             user.setName(dto.getName());
             user.setEmail(dto.getEmail());
             user = attachCertificatesToUser(user, dto.getCertificates());
+            user.setMigrationStatus(MigrationStatus.NEW);
             User updatedUser = userRepository.save(user);
             return userMapper.mapModelToDto(updatedUser);
         } catch (Exception e) {
@@ -67,13 +70,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(long id) {
-        Optional<User> user = userRepository.findById(id);
+    public void deleteUser(String id) {
+        Optional<User> user = userRepository.findById(Long.parseLong(id));
         if (user.isEmpty()) {
             return;
         }
         user.get().getCertificates().forEach(cert -> userRepository.deleteById(cert.getId()));
-        userRepository.deleteById(id);
+        userRepository.deleteById(Long.parseLong(id));
     }
 
     @Override
@@ -87,6 +90,7 @@ public class UserServiceImpl implements UserService {
         certificateDtos.stream()
                 .map(certificateMapper::mapDtoToModel)
                 .peek(cert -> cert.setUser(user))
+                .peek(cert -> cert.setMigrationStatus(MigrationStatus.NEW))
                 .forEach(cert -> user.getCertificates().add(cert));
         return user;
     }
