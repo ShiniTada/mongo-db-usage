@@ -1,6 +1,5 @@
 package com.example.demo.service.accessdata.impl;
 
-import com.example.demo.data.Certificate;
 import com.example.demo.document.CertificateDoc;
 import com.example.demo.document.UserDoc;
 import com.example.demo.dto.CertificateDto;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service("AccessUserDocService")
 public class AccessUserDocService implements IAccessUserService {
@@ -27,7 +25,7 @@ public class AccessUserDocService implements IAccessUserService {
     }
 
     @Override
-    public UserDto getUserById(String userId) {
+    public UserDto getById(String userId) {
         Optional<UserDoc> user = repository.findById(userId);
         if (user.isEmpty() && isLong(userId)) {
             user = repository.findByUserId(Long.parseLong(userId));
@@ -38,21 +36,21 @@ public class AccessUserDocService implements IAccessUserService {
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
+    public List<UserDto> getAll() {
         return repository.findAll().stream()
                 .map(userMapper::mapModelToDto)
                 .toList();
     }
 
     @Override
-    public UserDto createUser(UserDto dto) {
+    public UserDto create(UserDto dto) {
         UserDoc user = userMapper.mapDtoToModel(dto);
         UserDoc savedUser = repository.save(user);
         return userMapper.mapModelToDto(savedUser);
     }
 
     @Override
-    public UserDto updateUser(UserDto dto) {
+    public UserDto update(UserDto dto) {
         try {
             String id = dto.getId();
             UserDoc user = repository.findById(id)
@@ -71,7 +69,7 @@ public class AccessUserDocService implements IAccessUserService {
     }
 
     @Override
-    public void deleteUser(String userId) {
+    public void delete(String userId) {
         Optional<UserDoc> user = repository.findById(userId);
         if (user.isPresent()) {
             repository.deleteById(userId);

@@ -26,7 +26,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public UserDto getUserById(@PathVariable String id) {
-        return accessUserService.getUserById(id);
+        return accessUserService.getById(id);
     }
 
     @GetMapping
@@ -34,22 +34,22 @@ public class UserController {
         if (email != null && !email.isEmpty()) {
             return List.of(accessUserService.getByEmail(email));
         }
-        return accessUserService.getAllUsers();
+        return accessUserService.getAll();
     }
 
     @PostMapping
     public UserDto createUser(@RequestBody UserDto userDto) {
-        return accessUserService.createUser(userDto);
+        return accessUserService.create(userDto);
     }
 
     @PutMapping("/{id}")
-    public UserDto updateUser(@PathVariable long id, @RequestBody UserDto userDto) {
-        userDto.setId(String.valueOf(id));
-        return accessUserService.updateUser(userDto);
+    public UserDto updateUser(@PathVariable String id, @RequestBody UserDto userDto) {
+        userDto.setId(id);
+        return accessUserService.update(userDto);
     }
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable String id) {
-        accessUserService.deleteUser(id);
+        accessUserService.delete(id);
     }
 }

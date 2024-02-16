@@ -28,21 +28,21 @@ public class AccessUserService implements IAccessUserService {
     }
 
     @Override
-    public UserDto getUserById(String userId) {
+    public UserDto getById(String userId) {
         return userRepository.findById(Long.parseLong(userId))
                 .map(userMapper::mapModelToDto)
                 .orElseThrow(() -> new RuntimeException("No user with ID: " + userId));
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
+    public List<UserDto> getAll() {
         List<UserDto> userDtoList = new ArrayList<>();
         userRepository.findAll().forEach(u -> userDtoList.add(userMapper.mapModelToDto(u)));
         return userDtoList;
     }
 
     @Override
-    public UserDto createUser(UserDto dto) {
+    public UserDto create(UserDto dto) {
         User user = userMapper.mapDtoToModel(dto);
         user = attachCertificatesToUser(user, dto.getCertificates());
         user.setMigrationStatus(MigrationStatus.NEW);
@@ -51,7 +51,7 @@ public class AccessUserService implements IAccessUserService {
     }
 
     @Override
-    public UserDto updateUser(UserDto dto) {
+    public UserDto update(UserDto dto) {
         try {
             Long userId = Long.parseLong(dto.getId());
             User user = userRepository.findById(userId)
@@ -70,7 +70,7 @@ public class AccessUserService implements IAccessUserService {
     }
 
     @Override
-    public void deleteUser(String id) {
+    public void delete(String id) {
         Optional<User> user = userRepository.findById(Long.parseLong(id));
         if (user.isEmpty()) {
             return;

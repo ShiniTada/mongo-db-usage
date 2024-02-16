@@ -27,29 +27,29 @@ public class UserDocController {
 
     @GetMapping("/{id}")
     public UserDto getUserById(@PathVariable String id) {
-        return accessUserService.getUserById(id);
+        return accessUserService.getById(id);
     }
     @GetMapping
     public List<UserDto> getUsers(@RequestParam(required = false) String email) {
         if (email != null && !email.isEmpty()) {
             return List.of(accessUserService.getByEmail(email));
         }
-        return accessUserService.getAllUsers();
+        return accessUserService.getAll();
     }
 
     @PostMapping
     public UserDto createUser(@RequestBody UserDto userDto) {
-        return accessUserService.createUser(userDto);
+        return accessUserService.create(userDto);
     }
 
     @PutMapping("/{id}")
     public UserDto updateUser(@PathVariable String id, @RequestBody UserDto userDto) {
         userDto.setId(id);
-        return accessUserService.updateUser(userDto);
+        return accessUserService.update(userDto);
     }
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable String id) {
-        accessUserService.deleteUser(id);
+        accessUserService.delete(id);
     }
 }
