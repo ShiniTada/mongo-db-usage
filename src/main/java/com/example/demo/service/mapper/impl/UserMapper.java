@@ -4,29 +4,31 @@ import com.example.demo.data.Certificate;
 import com.example.demo.data.User;
 import com.example.demo.dto.CertificateDto;
 import com.example.demo.dto.UserDto;
-import com.example.demo.service.mapper.Mapper;
+import com.example.demo.service.mapper.IMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class UserMapper implements Mapper<User, UserDto> {
+public class UserMapper implements IMapper<User, UserDto> {
 
-    private final Mapper<Certificate, CertificateDto> certificateDocMapper;
+    private final IMapper<Certificate, CertificateDto> certificateDocMapper;
 
-    public UserMapper(Mapper<Certificate, CertificateDto> certificateDocMapper) {
+    public UserMapper(IMapper<Certificate, CertificateDto> certificateDocMapper) {
         this.certificateDocMapper = certificateDocMapper;
     }
 
     @Override
     public UserDto mapModelToDto(User model) {
-        return new UserDto(model.getId(), model.getName(), model.getEmail(), mapCertificatesToDto(model.getCertificates()));
+        return new UserDto(String.valueOf(model.getId()), model.getName(), model.getEmail(), mapCertificatesToDto(model.getCertificates()));
     }
 
     @Override
     public User mapDtoToModel(UserDto dto) {
         User user = new User();
-        user.setId(dto.getId());
+        if(dto.getId() != null) {
+            user.setId(Long.parseLong(dto.getId()));
+        }
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         return user;
